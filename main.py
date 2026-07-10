@@ -1,12 +1,34 @@
+import time
 import requests
-url = input("下载链接:")
+from ToolFun import *
+from pgbar import *
 
-print("您需要下载的链接是:"+url)
 
-#https://lf9-ug-sign.feishucdn.com/ee-appcenter/ba9359bd/Feishu-win32_x64-7.71.12-signed.exe?lk3s=fb957577\u0026x-expires=1783618326\u0026x-signature=aT1lXDrg7SumRnMrn9Hiqo60ugs%3D
-response = requests.get(url)
 
-filename = "software.exe"
 
-with open(filename,"wb") as f:
-    f.write(response.content)
+# https://proof.ovh.net/files/1Mb.dat?ss=1
+def download():
+    url = input("下载链接:")
+    bar = pgbar()
+
+    response = requests.get(url,stream=True)
+
+    filename = getfilename(response.url)
+    if response.headers["Content-Length"]:
+        filesize = int(response.headers.get("Content-Length"))
+    else:
+        filesize = 0
+        print("文件大小为0")
+        exit(0)
+
+    bar.file_name = filename
+    bar.size = filesize
+    bar.init_info(filesize,filename)
+
+    with open(filename, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024*48):
+            f.write(chunk)
+            bar.update(len(chunk))
+    bar.finish()
+
+download()
