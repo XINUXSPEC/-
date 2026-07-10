@@ -3,9 +3,6 @@ import requests
 from ToolFun import *
 from pgbar import *
 
-
-
-
 # https://proof.ovh.net/files/1Mb.dat?ss=1
 def download():
     url = input("下载链接:")
@@ -14,13 +11,11 @@ def download():
     response = requests.get(url,stream=True)
 
     filename = getfilename(response.url)
-    if response.headers["Content-Length"]:
-        filesize = int(response.headers.get("Content-Length"))
+    if response.headers.get("Content-Length"):
+        filesize = int(response.headers["Content-Length"])
     else:
-        filesize = 0
-        print("文件大小为0")
-        exit(0)
-
+        filesize = None
+        print("文件大小未知")
     bar.file_name = filename
     bar.size = filesize
     bar.init_info(filesize,filename)
