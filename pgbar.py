@@ -18,7 +18,8 @@ class pgbar:
 
     def init_info(self,total_byte,filename):
         self.total_byte = total_byte
-        self.total_text = get_unit(total_byte)
+        if total_byte:
+            self.total_text = get_unit(total_byte)
         self.file_name = filename
         self.download_size = 0
         self.speed = 0
@@ -28,18 +29,29 @@ class pgbar:
         self.first = False
 
     def render(self):
+
+        if self.first:
+            if self.total_text:
+                print("\033[3F", end="")  # 上移三行
+                print("\033[J", end="")  # 清除旧内容
+            else:
+                print("\033[2F", end="")  # 上移两行
+                print("\033[J", end="")  # 清除旧内容
+        self.first = True
+        # 第一行：文件名
+        print(BOLD+f"{WHITE}📄  {self.file_name}{RESET}")
+
+        # 第二行和第三行
+        if self.total_byte:
+            self._render_know()
+        else:
+            self._render_unknow()
+    def _render_know(self):
         if self.download_size < self.total_byte:
             self.speed = round(self.cycle_size / (time.time() - self.cycle_time), 1)
             self.desc = get_unit(self.speed) + '/s'
         else:
             self.desc = "完成"
-        if self.first:
-            print("\033[3F", end="")  # 上移三行
-            print("\033[J", end="")  # 清除旧内容
-        self.first = True
-        # 第一行：文件名
-        print(BOLD+f"{WHITE}📄  {self.file_name}{RESET}")
-
         # 第二行：下载信息
         percent = self.download_size / self.total_byte * 100
         print(
@@ -62,10 +74,19 @@ class pgbar:
                 GRAY +
                 "─" * (self.width - filled) +
                 RED +
-                "  ETA " + f'{format(int(second/60), "02d")}:{format(int(second%60), "02d")}' +
+                "  ETA " + f'{format(int(second / 60), "02d")}:{format(int(second % 60), "02d")}' +
                 RESET
         )
         print(bar)
+
+    def _render_unknow(self):
+        self.speed = round(self.cycle_size / (time.time() - self.cycle_time), 1)
+        self.desc = get_unit(self.speed) + '/s'
+        print(
+            f"{CYAN}速度：{self.desc}{RESET}   ",
+            f"{YELLOW}已下载：{get_unit(self.download_size)}{RESET}"
+        )
+
 
     def update(self,sz):
         self.cycle_size +=sz
@@ -78,9 +99,10 @@ class pgbar:
     def finish(self):
         self.render()
         tm = time.time() - self.start_time
+        print("\n")
         print(
             f"{CYAN}📦 总大小:{RESET} "
-            f"{BRIGHT_YELLOW}{get_unit(self.total_byte)}{RESET}"
+            f"{BRIGHT_YELLOW}{get_unit(self.download_size)}{RESET}"
         )
 
         print(
@@ -91,6 +113,6 @@ class pgbar:
 
         print(
             f"{CYAN}⚡ 平均速度:{RESET} "
-            f"{BRIGHT_GREEN}{get_unit(self.total_byte / tm)}{RESET}"
+            f"{BRIGHT_GREEN}{get_unit(self.download_size / tm)}{RESET}"
             f"{GRAY}/s{RESET}"
         )
