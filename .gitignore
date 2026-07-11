@@ -1,4 +1,23 @@
-1Gb.dat
-1Mb.dat
-software.jpg
-test.py
+# 忽略操作系统自动生成的文件
+.DS_Store
+Thumbs.db
+
+# 忽略常见 IDE 和编辑器的配置文件
+.idea/
+.vscode/
+*.swp
+
+# 忽略依赖包文件夹（项目构建时会自动重新下载）
+node_modules/
+vendor/
+
+# 忽略编译/构建产物
+/dist/
+/build/
+*.class
+*.pyc
+
+#忽略测试
+*.dat
+*.jpg
+*.exe
