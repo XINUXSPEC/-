@@ -1,5 +1,6 @@
-import time
-from time import sleep
+import os.path
 
-s = 1000
+
+if os.path.exists("D://ss.txt") is False:
+    open("D://ss.txt", 'w').close()
 
