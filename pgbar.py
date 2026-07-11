@@ -16,12 +16,12 @@ class pgbar:
         self.start_time = None
 
 
-    def init_info(self,total_byte,filename):
+    def init_info(self,total_byte,filename,download_size=0):
         self.total_byte = total_byte
         if total_byte:
             self.total_text = get_unit(total_byte)
         self.file_name = filename
-        self.download_size = 0
+        self.download_size = download_size
         self.speed = 0
         self.cycle_size = 0
         self.cycle_time = time.time()
@@ -116,3 +116,6 @@ class pgbar:
             f"{BRIGHT_GREEN}{get_unit(self.download_size / tm)}{RESET}"
             f"{GRAY}/s{RESET}"
         )
+
+
+
