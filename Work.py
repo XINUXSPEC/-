@@ -1,6 +1,4 @@
 import requests
-from requests.exceptions import ChunkedEncodingError,ConnectionError
-import traceback
 
 from pgbar import *
 
@@ -32,7 +30,7 @@ class Work:
 
 
 
-    #   断点重传
+    # 断点重传
     def continue_download(self,task):
         bar = pgbar()
         url = task.get_url()
@@ -52,5 +50,24 @@ class Work:
                     bar.update(len(chunk))
             bar.finish()
 
+    # 指定Range偏移进行下载
+    def chunk_download(self,task):
+        url = task.get_url()
+        local_url = task.get_local_url()
+        if not task.is_last_state:
+            start,end = task.get_range()
+        else :
+            start = task.get_last_range()
+        with requests.get(url, stream=True, timeout=(5, 10),headers=task.headers) as response:
+            with open(local_url, "r+b") as f:
+                f.seek(start)
+                for chunk in response.iter_content(chunk_size=1024 * 48):
+                    f.write(chunk)
+        print("下载完成,大小为"+str(task.get_size()),"开始位置",start)
 
 
+    # 获取文件的大小
+    def get_file_size(self,task):
+        url = task.get_url()
+        response = requests.get(url, stream=True, timeout=(5, 10))
+        return  int(response.headers.get("Content-Length"))

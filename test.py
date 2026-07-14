@@ -1,6 +1,4 @@
-import os.path
+import time, threading
 
-
-if os.path.exists("D://ss.txt") is False:
-    open("D://ss.txt", 'w').close()
-
+input("1")
+print("assasasas")
